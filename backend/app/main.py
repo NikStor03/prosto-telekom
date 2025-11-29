@@ -4,7 +4,7 @@ from fastapi import FastAPI
 from app.core.config import settings
 from app.db.session import engine
 from app.db import base  # noqa: F401
-from app.api.v1.endpoints import auth, users, webhook
+from app.api.v1.endpoints import auth, users, webhook, businesses
 
 
 def create_app() -> FastAPI:
@@ -17,6 +17,7 @@ def create_app() -> FastAPI:
     app.include_router(auth.router, prefix=settings.API_V1_STR)
     app.include_router(users.router, prefix=settings.API_V1_STR)
     app.include_router(webhook.router)
+    app.include_router(businesses.router)
 
     return app
 

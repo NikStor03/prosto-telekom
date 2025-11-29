@@ -7,11 +7,11 @@ class Settings(BaseSettings):
     PROJECT_NAME: str = "Prosto Telekom API"
     API_V1_STR: str = "/api/v1"
 
-    SECRET_KEY: str = "CHANGE_ME"
+    SECRET_KEY: str = "supersecretkey123"
     ACCESS_TOKEN_EXPIRE_HOURS: int = 60
     ALGORITHM: str = "HS256"
 
-    DATABASE_URL: AnyUrl = "postgresql://postgres:postgres@localhost:5432/postgres"
+    DATABASE_URL: AnyUrl = "postgresql+psycopg2://postgres:postgres@localhost:5432/postgres"
     VERIFY_TOKEN: str = "SDfanqhqwekDjhafhakfkka"
 
     class Config:
