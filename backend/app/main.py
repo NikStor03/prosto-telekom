@@ -11,7 +11,7 @@ def create_app() -> FastAPI:
     app = FastAPI(title=settings.PROJECT_NAME)
 
     # создаём таблицы (в реальном проекте лучше Alembic)
-    base.Base.metadata.create_all(bind=engine)
+    # base.Base.metadata.create_all(bind=engine)
 
     # подключаем роутеры
     app.include_router(auth.router, prefix=settings.API_V1_STR)
