@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi import FastAPI, Request, HTTPException
 
 from app.core.config import settings
+from app.modules.whatsapp import WhatsApp
 
 router = APIRouter()
 
@@ -27,18 +28,13 @@ async def webhook(request: Request):
         text = message["text"]["body"]
         print(f"User {sender} said: {text}")
 
-        # Optional: send auto-reply
         """
-        requests.post(
-            f"https://graph.facebook.com/v20.0/YOUR_PHONE_NUMBER_ID/messages",
-            headers={"Authorization": f"Bearer YOUR_ACCESS_TOKEN"},
-            json={
-                "messaging_product": "whatsapp",
-                "to": sender,
-                "text": {"body": "Hi! I got your message."}
-            }
-        )
+        Incoming message: {'object': 'whatsapp_business_account', 'entry': [{'id': '726862520452522', 'changes': [{'value': {'messaging_product': 'whatsapp', 'metadata': {'display_phone_number': '15551642126', 'phone_number_id': '914328498426772'}, 'contacts': [{'profile': {'name': 'Mykyta'}, 'wa_id': '380999723755'}], 'messages': [{'from': '380999723755', 'id': 'wamid.HBgMMzgwOTk5NzIzNzU1FQIAEhgUM0E2NDU5MjUzM0VBMjQxNjQ2NTEA', 'timestamp': '1764447530', 'text': {'body': 'Vhdn'}, 'type': 'text'}]}, 'field': 'messages'}]}]}
+        User 380999723755 said: Vhdn
         """
+        whats_app = WhatsApp(data)
+        print(whats_app.process_whatsapp_message())
+
     except Exception as e:
         print("No message found or error:", e)
 
