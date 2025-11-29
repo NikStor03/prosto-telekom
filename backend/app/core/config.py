@@ -8,7 +8,7 @@ class Settings(BaseSettings):
     API_V1_STR: str = "/api/v1"
 
     SECRET_KEY: str = "CHANGE_ME"
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
+    ACCESS_TOKEN_EXPIRE_HOURS: int = 60
     ALGORITHM: str = "HS256"
 
     DATABASE_URL: AnyUrl = "postgresql://postgres:postgres@localhost:5432/postgres"
