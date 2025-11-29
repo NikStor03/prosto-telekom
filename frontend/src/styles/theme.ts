@@ -20,20 +20,20 @@ export const theme = createTheme({
       main: '#ecb22e', // Slack yellow
     },
     error: {
-      main: '#e01e5a', // Slack red
+      main: '#e01e5a', // Slack red/pink
     },
     background: {
       default: '#f6f5f7', // light gray app background
       paper: '#ffffff', // cards / forms
     },
     text: {
-      primary: '#1d1c1d', // near‑black
-      secondary: '#616061', // muted text
+      primary: '#1d1c1d',
+      secondary: '#616061',
     },
     divider: 'rgba(29,28,29,0.12)',
   },
   typography: {
-    // Slack UI использует Lato / system sans [web:232][web:234]
+    // Slack UI uses Lato / system sans family [web:232][web:234]
     fontFamily:
       '"Lato", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif',
     h4: {
@@ -43,31 +43,6 @@ export const theme = createTheme({
     button: {
       textTransform: 'none',
       fontWeight: 600,
-    },
-  },
-  shape: {
-    borderRadius: 8,
-  },
-  components: {
-    MuiTextField: {
-      defaultProps: {
-        variant: 'outlined',
-      },
-    },
-    MuiButton: {
-      styleOverrides: {
-        root: {
-          borderRadius: 999,
-          paddingInline: 20,
-        },
-      },
-    },
-    MuiPaper: {
-      styleOverrides: {
-        root: {
-          borderRadius: 16,
-        },
-      },
     },
   },
 });
