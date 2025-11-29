@@ -7,7 +7,7 @@ import {
 
 import { authApi } from '@api/auth';
 
-import { LoginRequest, RegisterRequest } from '@interfaces/auth';
+import { LoginRequest, RegisterRequest, TokenResponse } from '@interfaces/auth';
 
 interface AuthState {
   accessToken?: string;
@@ -22,21 +22,33 @@ const initialState: AuthState = {
 };
 
 export const registerThunk = createAsyncThunk<
-  any,
+  TokenResponse,
   RegisterRequest,
   { rejectValue: string }
->('auth/register', async (payload) => {
-  const response = await authApi.register(payload);
-  return response.data;
+>('auth/register', async (payload, { rejectWithValue }) => {
+  try {
+    const response = await authApi.register(payload);
+    return response.data;
+  } catch (error: any) {
+    const message =
+      error.response?.data?.message || error.message || 'Registration failed';
+    return rejectWithValue(message);
+  }
 });
 
 export const loginThunk = createAsyncThunk<
-  any,
+  TokenResponse,
   LoginRequest,
   { rejectValue: string }
->('auth/login', async (payload) => {
-  const response = await authApi.login(payload);
-  return response.data;
+>('auth/login', async (payload, { rejectWithValue }) => {
+  try {
+    const response = await authApi.login(payload);
+    return response.data;
+  } catch (error: any) {
+    const message =
+      error.response?.data?.message || error.message || 'Login failed';
+    return rejectWithValue(message);
+  }
 });
 
 const authSlice = createSlice({
@@ -53,10 +65,12 @@ const authSlice = createSlice({
       .addCase(registerThunk.fulfilled, (state, action) => {
         state.accessToken = action.payload.access_token;
         state.loading = false;
+        state.error = '';
       })
       .addCase(loginThunk.fulfilled, (state, action) => {
         state.accessToken = action.payload.access_token;
         state.loading = false;
+        state.error = '';
       });
 
     builder.addMatcher(isPending(registerThunk, loginThunk), (state) => {
@@ -64,10 +78,14 @@ const authSlice = createSlice({
       state.error = '';
     });
 
-    builder.addMatcher(isRejected, (state, action) => {
-      state.loading = false;
-      state.error = action.error.message || 'Unknown error';
-    });
+    builder.addMatcher(
+      isRejected(registerThunk, loginThunk),
+      (state, action) => {
+        state.loading = false;
+        state.error =
+          (action.payload as string) || action.error.message || 'Unknown error';
+      }
+    );
   },
 });
 
