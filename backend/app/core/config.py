@@ -12,7 +12,7 @@ class Settings(BaseSettings):
     ALGORITHM: str = "HS256"
 
     DATABASE_URL: AnyUrl = "postgresql://postgres:postgres@localhost:5432/postgres"
-    VERIFY_TOKEN = "SDfanqhqwekDjhafhakfkka"
+    VERIFY_TOKEN: str = "SDfanqhqwekDjhafhakfkka"
 
     class Config:
         env_file = ".env"
