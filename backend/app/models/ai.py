@@ -5,27 +5,31 @@ from sqlalchemy import Integer, String, Enum, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
-# from .forms import Form
-# from app.enums.ai import AIType
-# from buisness import Businesses
-# from .notes import Notes
-# from .credetials import Credential
-
 class AI(Base):
     __tablename__ = "ai"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    # type: Mapped[AIType] = mapped_column(Enum(AIType), nullable=False)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
 
-    # Link to Credential (one-to-one)
-    credential_id: Mapped[int] = mapped_column(ForeignKey("credentials.id"), unique=True)
+    credential_id: Mapped[int] = mapped_column(ForeignKey("credentials.id"))
     credential: Mapped["Credential"] = relationship(back_populates="ai")
 
-    # Link to Form (one-to-one)
-    form_id: Mapped[int] = mapped_column(ForeignKey("forms.id"), nullable=False)
-    form: Mapped["Form"] = relationship(back_populates="ai", uselist=False)
+    business_id: Mapped[int | None] = mapped_column(ForeignKey("businesses.id"))
+    business: Mapped["Businesses | None"] = relationship(
+        back_populates="ai_items",
+        uselist=False
+    )
 
-    # Link to Notes (one-to-one)
-    notes_id: Mapped[int] = mapped_column(ForeignKey("notes.id"), nullable=False)
-    notes: Mapped["Notes"] = relationship(back_populates="ai", uselist=False)
+    # ✅ NO FK COLUMN HERE ANYMORE
+    form: Mapped["Form | None"] = relationship(
+        "Form",
+        back_populates="ai",
+        uselist=False
+    )
+
+    # ✅ Notes relationship (already fixed)
+    notes: Mapped["Notes | None"] = relationship(
+        "Notes",
+        back_populates="ai",
+        uselist=False
+    )

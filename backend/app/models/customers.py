@@ -15,6 +15,8 @@ class Customer(Base):
     business_id: Mapped[int] = mapped_column(ForeignKey("businesses.id"), nullable=False)
     business: Mapped["Businesses"] = relationship("Businesses", back_populates="customers")
 
+    chat: Mapped["Chat"] = relationship("Chat", back_populates="customer", uselist=False)
+
     answers: Mapped[list["Answers"]] = relationship(
         "Answers",
         back_populates="customer",

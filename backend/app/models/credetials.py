@@ -10,10 +10,10 @@ class Credential(Base):
     __tablename__ = "credentials"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    api_key_instagram: Mapped[str] = mapped_column(String(255))
-    whatsapp_verify_token: Mapped[str] = mapped_column(String(255))
-    whatsapp_token: Mapped[str] = mapped_column(String(255))
-    whatsapp_phone_number_id: Mapped[str] = mapped_column(String(255))
+    api_key_instagram: Mapped[str] = mapped_column(String(2048))
+    whatsapp_verify_token: Mapped[str] = mapped_column(String(2048))
+    whatsapp_token: Mapped[str] = mapped_column(String(2048))
+    whatsapp_phone_number_id: Mapped[str] = mapped_column(String(2048))
 
+    ai: Mapped[list["AI"]] = relationship(back_populates="credential")
     # One Credential has one AI
-    ai: Mapped["AI"] = relationship(back_populates="credential", uselist=False)
