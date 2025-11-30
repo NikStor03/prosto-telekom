@@ -108,7 +108,7 @@ export default function DashboardPage({ params }: DashboardPageProps) {
 
   const [agents, setAgents] = useState<Agent[]>([
     {
-      id: '1',
+      id: '59e86f71-dca2-457a-aff7-9caa12f5df4c',
       name: 'Store support bot',
       type: 'support',
       description: 'Handles customer inquiries',
@@ -152,7 +152,7 @@ export default function DashboardPage({ params }: DashboardPageProps) {
       ],
     },
     {
-      id: '2',
+      id: '4180be14-49e5-4528-b03d-7d431ff39951',
       name: 'B2B sales assistant',
       type: 'sales',
       description: 'Manages sales pipeline',
