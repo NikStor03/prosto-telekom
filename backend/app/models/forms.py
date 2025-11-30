@@ -12,23 +12,11 @@ from app.db.base import Base
 from .customers import Customer
 from .ai import AI
 class Form(Base):
-    __tablename__ = "forms"
+    __tablename__ = "form"
 
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
 
-    # ✅ THE ONLY FK BETWEEN FORM AND AI
-    ai_id: Mapped[int | None] = mapped_column(
-        ForeignKey("ai.id"),
-        nullable=True
-    )
-
-    ai: Mapped["AI | None"] = relationship(
-        "AI",
-        back_populates="form",
-        foreign_keys=[ai_id],   # ✅ LOCAL COLUMN ONLY
-        uselist=False
-    )
     form_fields: Mapped[list["FormFields"]] = relationship(
         "FormFields",
         back_populates="form",
