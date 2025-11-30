@@ -46,7 +46,7 @@ export default function Panel({
   const [isExpanded, setIsExpanded] = useState(false);
   const [selectedAgent, setSelectedAgent] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const handleMouseEnter = () => {
     setIsExpanded(true);
     onExpandChange?.(true);

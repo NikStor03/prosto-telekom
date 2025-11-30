@@ -19,7 +19,6 @@ export const authApi = {
     });
   },
 
-  // Реєстрація приймає JSON
   register: (payload: RegisterRequest) =>
     api.post<{ email: string; id: number; is_active: boolean }>(
       '/api/v1/auth/register',

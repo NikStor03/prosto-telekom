@@ -5,7 +5,18 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 import { Routes } from '@constants/routes';
-import { AppBar, Box, Button, Grid, Toolbar, Typography } from '@mui/material';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import {
+  AppBar,
+  Box,
+  Button,
+  Container,
+  Grid,
+  IconButton,
+  Toolbar,
+  Tooltip,
+  Typography,
+} from '@mui/material';
 
 import { CompanyCard } from '@components/cards/Company';
 import { CreateFab } from '@components/fabs/Create';
@@ -21,19 +32,11 @@ export default function HomePage() {
   const [modalOpen, setModalOpen] = useState(false);
   const router = useRouter();
 
-  const handleOpenModal = () => {
-    setModalOpen(true);
-  };
-
-  const handleCloseModal = () => {
-    setModalOpen(false);
-  };
+  const handleOpenModal = () => setModalOpen(true);
+  const handleCloseModal = () => setModalOpen(false);
 
   const handleCreateCompany = (data: CompanyFormData) => {
-    const newCompany: Company = {
-      ...data,
-      id: Date.now().toString(),
-    };
+    const newCompany: Company = { ...data, id: Date.now().toString() };
     setCompanies((prev) => [...prev, newCompany]);
   };
 
@@ -46,7 +49,12 @@ export default function HomePage() {
   };
 
   return (
-    <Box sx={{ minHeight: '100vh', backgroundColor: 'background.default' }}>
+    <Box
+      sx={{
+        minHeight: '100vh',
+        backgroundColor: '#FAFAFA',
+      }}
+    >
       <AppBar
         position="static"
         elevation={0}
@@ -76,33 +84,36 @@ export default function HomePage() {
         </Toolbar>
       </AppBar>
 
-      <Box
-        sx={{
-          minHeight: 'calc(100vh - 64px)',
-          px: '5%',
-          py: '5%',
-        }}
-      >
+      <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
         {companies.length === 0 ? (
           <Box
             sx={{
-              minHeight: '70vh',
+              minHeight: '82vh',
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
               justifyContent: 'center',
               gap: 3,
+              textAlign: 'center',
             }}
           >
             <Typography
               variant="h4"
               sx={{
-                color: '#FFFFFF',
-                textAlign: 'center',
+                fontWeight: 700,
                 mb: 2,
+                color: 'text.primary',
               }}
             >
               Welcome! Create your first company
+            </Typography>
+            <Typography
+              variant="body1"
+              color="text.secondary"
+              sx={{ maxWidth: 480 }}
+            >
+              Create a company to start connecting Sparrow agents to your
+              business.
             </Typography>
             <Button
               variant="contained"
@@ -111,9 +122,10 @@ export default function HomePage() {
               sx={{
                 px: 6,
                 py: 2,
+                borderRadius: 999,
               }}
             >
-              Create Company
+              Create company
             </Button>
           </Box>
         ) : (
@@ -121,12 +133,12 @@ export default function HomePage() {
             <Typography
               variant="h4"
               sx={{
-                color: '#FFFFFF',
                 fontWeight: 700,
                 mb: 4,
+                color: 'text.primary',
               }}
             >
-              Your Companies
+              Your companies
             </Typography>
 
             <Grid container spacing={3}>
@@ -157,7 +169,7 @@ export default function HomePage() {
           onClose={handleCloseModal}
           onSubmit={handleCreateCompany}
         />
-      </Box>
+      </Container>
     </Box>
   );
 }

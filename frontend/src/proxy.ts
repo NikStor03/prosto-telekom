@@ -5,17 +5,17 @@ import { AuthRoutes, Routes } from '@constants/routes';
 import { getCookie } from '@proxy/cookies';
 
 export async function proxy(request: NextRequest) {
-  const accessToken = getCookie({ request, name: Cookies.ACCESS_TOKEN });
-
-  const currentPath = request.nextUrl.pathname;
-
-  if (!AuthRoutes.includes(currentPath) && !accessToken) {
-    return NextResponse.redirect(new URL(Routes.Login, request.url));
-  }
-
-  if (AuthRoutes.includes(currentPath) && accessToken) {
-    return NextResponse.redirect(new URL(Routes.Dashboard, request.url));
-  }
+  // const accessToken = getCookie({ request, name: Cookies.ACCESS_TOKEN });
+  //
+  // const currentPath = request.nextUrl.pathname;
+  //
+  // if (!AuthRoutes.includes(currentPath) && !accessToken) {
+  //   return NextResponse.redirect(new URL(Routes.Login, request.url));
+  // }
+  //
+  // if (AuthRoutes.includes(currentPath) && accessToken) {
+  //   return NextResponse.redirect(new URL(Routes.Dashboard, request.url));
+  // }
 
   return NextResponse.next();
 }

@@ -24,6 +24,7 @@ import {
   Typography,
 } from '@mui/material';
 
+import CreateAgentModal from '@components/forms/Model';
 import Panel from '@components/panel/Panel';
 
 const iconBarWidth = 72;
@@ -195,6 +196,8 @@ export default function DashboardPage({ params }: DashboardPageProps) {
     useState<SupportTicket | null>(null);
   const [selectedSalesTicket, setSelectedSalesTicket] =
     useState<SalesTicket | null>(null);
+
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   const handleAgentSelect = (agentId: string) => {
     setSelectedAgent(agentId);
@@ -634,19 +637,48 @@ export default function DashboardPage({ params }: DashboardPageProps) {
   const renderAgentInfo = () => {
     if (!currentAgent) {
       return (
-        <Paper
+        <Box
           sx={{
-            backgroundColor: 'background.paper',
-            borderRadius: 2,
-            p: 4,
-            border: 1,
-            borderColor: 'divider',
+            flexGrow: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            minHeight: 'calc(90vh - 80px)',
+            textAlign: 'center',
           }}
         >
-          <Typography variant="body1" color="text.secondary">
-            Select an agent from the sidebar to start.
+          <Typography
+            variant="h4"
+            sx={{ mb: 4, fontWeight: 700, fontSize: 56 }}
+            color="text.primary"
+          >
+            Welcome to Agent Dashboard
           </Typography>
-        </Paper>
+          <Typography
+            variant="body1"
+            color="text.secondary"
+            sx={{ mb: 5, fontSize: 20 }}
+          >
+            Create your first Sparrow agent to start tracking conversations and
+            sales.
+          </Typography>
+
+          <Button
+            variant="contained"
+            color="primary"
+            size="large"
+            sx={{
+              px: 7,
+              py: 2,
+              borderRadius: 999,
+              fontSize: '1.05rem',
+            }}
+            onClick={() => setIsCreateModalOpen(true)}
+          >
+            Create your first bot
+          </Button>
+        </Box>
       );
     }
 
@@ -654,21 +686,7 @@ export default function DashboardPage({ params }: DashboardPageProps) {
       return renderSupportLayout(currentAgent);
     if (currentAgent.type === 'sales') return renderSalesLayout(currentAgent);
 
-    return (
-      <Paper
-        sx={{
-          backgroundColor: 'background.paper',
-          borderRadius: 2,
-          p: 4,
-          border: 1,
-          borderColor: 'divider',
-        }}
-      >
-        <Typography variant="body1" color="text.secondary">
-          No layout configured for this agent yet.
-        </Typography>
-      </Paper>
-    );
+    return null;
   };
 
   return (
@@ -732,30 +750,28 @@ export default function DashboardPage({ params }: DashboardPageProps) {
         </AppBar>
 
         <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
-          {!currentAgent ? (
-            <Typography variant="h4" sx={{ mb: 6 }} color="text.primary">
-              Welcome to Agent Dashboard
-            </Typography>
-          ) : (
+          {currentAgent && (
             <Box sx={{ mb: 4 }}>
-              <Typography variant="h4" sx={{ fontWeight: 700, mb: 1 }}>
-                {currentAgent.name}
-              </Typography>
-              <Stack direction="row" spacing={1} alignItems="center">
-                <Chip
-                  label={
-                    currentAgent.type === 'support'
-                      ? 'Support bot'
-                      : 'Sales bot'
-                  }
-                  color="primary"
-                  size="small"
-                />
-                <Chip label={`ID: ${currentAgent.id}`} size="small" />
-                <Typography variant="body2" color="text.secondary">
-                  Created: {currentAgent.createdAt} · Last active:{' '}
-                  {currentAgent.lastActiveAt}
+              <Stack direction="column" spacing={1} alignItems="flex-start">
+                <Typography variant="h4" sx={{ fontWeight: 700 }}>
+                  {currentAgent.name}
                 </Typography>
+                <Stack direction="row" spacing={1} alignItems="center">
+                  <Chip
+                    label={
+                      currentAgent.type === 'support'
+                        ? 'Support bot'
+                        : 'Sales bot'
+                    }
+                    color="primary"
+                    size="small"
+                  />
+                  <Chip label={`ID: ${currentAgent.id}`} size="small" />
+                  <Typography variant="body2" color="text.secondary">
+                    Created: {currentAgent.createdAt} · Last active:{' '}
+                    {currentAgent.lastActiveAt}
+                  </Typography>
+                </Stack>
               </Stack>
             </Box>
           )}
@@ -859,6 +875,14 @@ export default function DashboardPage({ params }: DashboardPageProps) {
           <Button onClick={() => setSelectedSalesTicket(null)}>Close</Button>
         </DialogActions>
       </Dialog>
+      <CreateAgentModal
+        open={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        onSubmit={(agentData: any) => {
+          handleCreateAgent(agentData);
+          setIsCreateModalOpen(false);
+        }}
+      />
     </Box>
   );
 }
