@@ -12,6 +12,8 @@ from app.models.credetials import Credential
 from app.models.ai import AI
 
 class WhatsApp:
+
+
     def __init__(self, message: dict = None, access_tokens: str = '', user_phone_number: str = '', business_phone_number: str = '914328498426772'):
 
         self.message = message
@@ -46,7 +48,6 @@ class WhatsApp:
         contact = entry['contacts'][0]
         phone_number = contact['wa_id']
         name = contact['profile']['name']
-
         phone_number_id = entry['metadata']['phone_number_id']
 
         with SessionLocal() as session:
@@ -97,7 +98,6 @@ class WhatsApp:
                 raise ValueError(f"No business found for phone_number_id={phone_number_id}")
 
             customer = self.get_or_create_customer()
-
             chat = (
                 session.query(Chat)
                 .filter(Chat.customer_id == customer.id)
@@ -120,7 +120,6 @@ class WhatsApp:
         phone_number = contact['wa_id']
         name = contact['profile']['name']
         phone_number_id = entry['metadata']['phone_number_id']
-
         msg_data = entry['messages'][0]
         msg_text = msg_data['text']['body']
         msg_sender = msg_data['from']
@@ -138,7 +137,6 @@ class WhatsApp:
                 raise ValueError(f"No business found for phone_number_id={phone_number_id}")
 
             customer = self.get_or_create_customer()
-
             chat = self.get_or_create_customer_chat()
             chat = chat[1]
 
@@ -178,3 +176,31 @@ class WhatsApp:
 
         print(response.status_code)
         print(response.json())
+
+
+if __name__ == '__main__':
+    waht = WhatsApp({
+            'object': 'whatsapp_business_account',
+            'entry': [{
+                'id': '726862520452522',
+                'changes': [{
+                    'value': {
+                        'messaging_product': 'whatsapp',
+                        'metadata': {
+                            'display_phone_number': '15551642126',
+                            'phone_number_id': '914328498426772'
+                        }, 'contacts': [{
+                            'profile': {
+                                'name': 'Mykyta'
+                            }, 'wa_id': '380999723755'
+                        }], 'messages': [{
+                            'from': '380999723755',
+                            'id': 'wamid.HBgMMzgwOTk5NzIzNzU1FQIAEhgUM0E2NDU5MjUzM0VBMjQxNjQ2NTEA',
+                            'timestamp': '1764447530',
+                            'text': {'body': 'Vhdn'},
+                            'type': 'text'}
+                        ]},
+                    'field': 'messages'}]}]})
+
+    print(waht.process_whatsapp_message())
+
