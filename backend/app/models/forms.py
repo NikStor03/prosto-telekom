@@ -1,39 +1,25 @@
-# app/models/form.py
 from __future__ import annotations
-
 from datetime import datetime, UTC
-
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import String, DateTime
-
-from app.models.user import User
 from app.db.base import Base
 from .customers import Customer
 from .ai import AI
+
+
 class Form(Base):
     __tablename__ = "forms"
 
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
 
-    # ✅ THE ONLY FK BETWEEN FORM AND AI
-    ai_id: Mapped[int | None] = mapped_column(
-        ForeignKey("ai.id"),
-        nullable=True
-    )
-
-    ai: Mapped["AI | None"] = relationship(
-        "AI",
-        back_populates="form",
-        foreign_keys=[ai_id],   # ✅ LOCAL COLUMN ONLY
-        uselist=False
-    )
     form_fields: Mapped[list["FormFields"]] = relationship(
         "FormFields",
         back_populates="form",
         cascade="all, delete-orphan"
     )
+
     answers: Mapped[list["Answers"]] = relationship(
         "Answers",
         back_populates="form",
@@ -42,7 +28,7 @@ class Form(Base):
 
 
 class FormFields(Base):
-    __tablename__ = "formfields"  # renamed to match ForeignKey
+    __tablename__ = "formfields"
 
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(255), nullable=True)

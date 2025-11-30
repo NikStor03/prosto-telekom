@@ -6,11 +6,10 @@ from sqlalchemy.orm import Session
 from app.api.deps import get_db, authenticate_user, get_user_by_email
 from app.core.security import get_password_hash, create_access_token
 from app.models.user import User
-from app.schemas.user import UserCreate, UserOut
+from app.schemas.user import UserCreate
 from app.schemas.token import Token
 
 router = APIRouter(prefix="/auth", tags=["auth"])
-
 
 @router.post("/register", response_model=Token, status_code=status.HTTP_201_CREATED)
 def register_user(
@@ -21,7 +20,7 @@ def register_user(
     if existing:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Пользователь с таким email уже существует",
+            detail="User with this email is already exist !",
         )
 
     db_user = User(
@@ -32,7 +31,6 @@ def register_user(
     db.commit()
     db.refresh(db_user)
 
-    # Авто-логин
     access_token = create_access_token({
         "sub": db_user.email,
         "user_id": db_user.id
@@ -60,5 +58,3 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
         "access_token": access_token,
         "token_type": "bearer"
     }
-
-

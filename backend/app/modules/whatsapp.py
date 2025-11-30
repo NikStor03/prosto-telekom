@@ -44,17 +44,13 @@ class WhatsApp:
             return result
 
     def get_or_create_customer(self):
-        # Extract WhatsApp info
         entry = self.message['entry'][0]['changes'][0]['value']
         contact = entry['contacts'][0]
         phone_number = contact['wa_id']
         name = contact['profile']['name']
-
-        # Get phone_number_id from metadata
         phone_number_id = entry['metadata']['phone_number_id']
 
         with SessionLocal() as session:
-            # Step 1: Find the business via Credential
             business = (
                 session.query(Businesses)
                 .join(Businesses.ai_items)
@@ -65,14 +61,12 @@ class WhatsApp:
             if not business:
                 raise ValueError(f"No business found for phone_number_id={phone_number_id}")
 
-            # Step 2: Check if customer already exists
             customer = (
                 session.query(Customer)
                 .filter(Customer.phone_number == phone_number, Customer.business_id == business.id)
                 .first()
             )
 
-            # Step 3: Create customer if not exist
             if not customer:
                 customer = Customer(
                     name=name,
@@ -93,7 +87,6 @@ class WhatsApp:
         phone_number_id = entry['metadata']['phone_number_id']
 
         with SessionLocal() as session:
-            # Step 1: Find the business via Credential
             business = (
                 session.query(Businesses)
                 .join(Businesses.ai_items)
@@ -104,10 +97,7 @@ class WhatsApp:
             if not business:
                 raise ValueError(f"No business found for phone_number_id={phone_number_id}")
 
-            # Step 2: Get or create customer
             customer = self.get_or_create_customer()
-
-            # Step 3: Get or create chat
             chat = (
                 session.query(Chat)
                 .filter(Chat.customer_id == customer.id)
@@ -130,15 +120,12 @@ class WhatsApp:
         phone_number = contact['wa_id']
         name = contact['profile']['name']
         phone_number_id = entry['metadata']['phone_number_id']
-
-        # Only handling the first message in this example
         msg_data = entry['messages'][0]
         msg_text = msg_data['text']['body']
         msg_sender = msg_data['from']
         msg_timestamp = datetime.fromtimestamp(int(msg_data['timestamp']), tz=timezone.utc)
 
         with SessionLocal() as session:
-            # Step 1: Find the business via Credential
             business = (
                 session.query(Businesses)
                 .join(Businesses.ai_items)
@@ -149,14 +136,10 @@ class WhatsApp:
             if not business:
                 raise ValueError(f"No business found for phone_number_id={phone_number_id}")
 
-            # Step 2: Get or create customer
             customer = self.get_or_create_customer()
-
-            # Step 3: Get or create chat
             chat = self.get_or_create_customer_chat()
             chat = chat[1]
 
-            # Step 4: Create message
             message = Message(
                 chat_id=int(chat.id),
                 sender=msg_sender,

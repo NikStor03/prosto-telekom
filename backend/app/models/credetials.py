@@ -1,9 +1,7 @@
-# app/models/credential.py
 from __future__ import annotations
-from sqlalchemy import Integer, String
+from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.db.base import Base
-# from app.models.buisness import Businesses
 
 
 class Credential(Base):
@@ -16,4 +14,3 @@ class Credential(Base):
     whatsapp_phone_number_id: Mapped[str] = mapped_column(String(2048))
 
     ai: Mapped[list["AI"]] = relationship(back_populates="credential")
-    # One Credential has one AI

@@ -1,4 +1,3 @@
-# app/schemas/users.py
 from pydantic import BaseModel, EmailStr
 
 
@@ -20,4 +19,4 @@ class UserOut(UserBase):
     is_active: bool
 
     class Config:
-        from_attributes = True  # Pydantic v2
+        from_attributes = True
