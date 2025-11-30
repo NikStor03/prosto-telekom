@@ -11,21 +11,29 @@ from app.models.user import User
 from app.db.base import Base
 from .customers import Customer
 from .ai import AI
-
 class Form(Base):
     __tablename__ = "forms"
 
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
 
+    # ✅ THE ONLY FK BETWEEN FORM AND AI
+    ai_id: Mapped[int | None] = mapped_column(
+        ForeignKey("ai.id"),
+        nullable=True
+    )
+
+    ai: Mapped["AI | None"] = relationship(
+        "AI",
+        back_populates="form",
+        foreign_keys=[ai_id],   # ✅ LOCAL COLUMN ONLY
+        uselist=False
+    )
     form_fields: Mapped[list["FormFields"]] = relationship(
         "FormFields",
         back_populates="form",
         cascade="all, delete-orphan"
     )
-
-    ai: Mapped["AI"] = relationship("AI", back_populates="form", uselist=False)
-
     answers: Mapped[list["Answers"]] = relationship(
         "Answers",
         back_populates="form",
@@ -37,11 +45,11 @@ class FormFields(Base):
     __tablename__ = "formfields"  # renamed to match ForeignKey
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    name: Mapped[str]
+    name: Mapped[str] = mapped_column(String(255), nullable=True)
+    value: Mapped[str] = mapped_column(String(1024), nullable=True)
 
     form_id: Mapped[int] = mapped_column(ForeignKey("forms.id"), nullable=False)
     form: Mapped["Form"] = relationship("Form", back_populates="form_fields")
-
     field_answers: Mapped[list["FieldAnswer"]] = relationship(
         "FieldAnswer",
         back_populates="field",
@@ -59,7 +67,8 @@ class Answers(Base):
     customer_id: Mapped[int] = mapped_column(ForeignKey("customers.id"), nullable=False)
     customer: Mapped["Customer"] = relationship("Customer", back_populates="answers")
 
-    ai: Mapped["AI"] = relationship("AI", back_populates="form", uselist=False)
+    ai_id: Mapped[int] = mapped_column(ForeignKey("ai.id"))
+    ai: Mapped["AI"] = relationship("AI")
 
     field_answers: Mapped[list["FieldAnswer"]] = relationship(
         "FieldAnswer",
@@ -77,8 +86,8 @@ class FieldAnswer(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     value: Mapped[str] = mapped_column(String(255), nullable=False)
 
-    form_id: Mapped[int] = mapped_column(ForeignKey("forms.id"), nullable=False)
-    field_id: Mapped[int] = mapped_column(ForeignKey("formfields.id"), nullable=False)
+    answer_id: Mapped[int] = mapped_column(ForeignKey("answers.id"), nullable=False)
+    answers: Mapped["Answers"] = relationship("Answers", back_populates="field_answers")
 
-    form: Mapped["Answers"] = relationship("Answers", back_populates="field_answers")
+    field_id: Mapped[int] = mapped_column(ForeignKey("formfields.id"), nullable=False)
     field: Mapped["FormFields"] = relationship("FormFields", back_populates="field_answers")
