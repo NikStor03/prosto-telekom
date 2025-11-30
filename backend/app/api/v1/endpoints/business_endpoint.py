@@ -22,6 +22,7 @@ def create_business(data: BusinessCreate, db: Session = Depends(get_db)):
     db.add(new_business)
     db.commit()
     db.refresh(new_business)
+
     return new_business
 
 

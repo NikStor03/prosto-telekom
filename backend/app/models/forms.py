@@ -1,15 +1,17 @@
 from __future__ import annotations
+
 from datetime import datetime, UTC
+
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import String, DateTime
+
+from app.models.user import User
 from app.db.base import Base
 from .customers import Customer
 from .ai import AI
-
-
 class Form(Base):
-    __tablename__ = "forms"
+    __tablename__ = "form"
 
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
@@ -19,7 +21,6 @@ class Form(Base):
         back_populates="form",
         cascade="all, delete-orphan"
     )
-
     answers: Mapped[list["Answers"]] = relationship(
         "Answers",
         back_populates="form",
@@ -34,7 +35,7 @@ class FormFields(Base):
     name: Mapped[str] = mapped_column(String(255), nullable=True)
     value: Mapped[str] = mapped_column(String(1024), nullable=True)
 
-    form_id: Mapped[int] = mapped_column(ForeignKey("forms.id"), nullable=False)
+    form_id: Mapped[int] = mapped_column(ForeignKey("form.id"), nullable=False)
     form: Mapped["Form"] = relationship("Form", back_populates="form_fields")
     field_answers: Mapped[list["FieldAnswer"]] = relationship(
         "FieldAnswer",
@@ -47,7 +48,7 @@ class Answers(Base):
     __tablename__ = "answers"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    form_id: Mapped[int] = mapped_column(ForeignKey("forms.id"), nullable=False)
+    form_id: Mapped[int] = mapped_column(ForeignKey("form.id"), nullable=False)
     form: Mapped["Form"] = relationship("Form", back_populates="answers")
 
     customer_id: Mapped[int] = mapped_column(ForeignKey("customers.id"), nullable=False)

@@ -1,4 +1,3 @@
-# app/api/v1/endpoints/auth.py
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
@@ -6,10 +5,11 @@ from sqlalchemy.orm import Session
 from app.api.deps import get_db, authenticate_user, get_user_by_email
 from app.core.security import get_password_hash, create_access_token
 from app.models.user import User
-from app.schemas.user import UserCreate
+from app.schemas.user import UserCreate, UserOut
 from app.schemas.token import Token
 
 router = APIRouter(prefix="/auth", tags=["auth"])
+
 
 @router.post("/register", response_model=Token, status_code=status.HTTP_201_CREATED)
 def register_user(
@@ -20,7 +20,7 @@ def register_user(
     if existing:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="User with this email is already exist !",
+            detail="Пользователь с таким email уже существует",
         )
 
     db_user = User(
@@ -58,3 +58,5 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
         "access_token": access_token,
         "token_type": "bearer"
     }
+
+

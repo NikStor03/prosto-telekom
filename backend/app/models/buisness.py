@@ -1,4 +1,5 @@
 from __future__ import annotations
+
 from app.db.base import Base
 
 from sqlalchemy import Integer, String, ForeignKey
@@ -22,7 +23,7 @@ class Businesses(Base):
     )
 
     ai_items: Mapped[list["AI"]] = relationship(
-        "AI",  # string name
+        "AI",
         back_populates="business",
         cascade="all, delete-orphan"
     )

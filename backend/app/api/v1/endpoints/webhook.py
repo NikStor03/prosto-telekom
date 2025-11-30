@@ -1,5 +1,5 @@
-from fastapi import APIRouter
-from fastapi import Request, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import FastAPI, Request, HTTPException
 
 from app.core.config import settings
 from app.modules.whatsapp import WhatsApp
@@ -13,6 +13,7 @@ async def verify(hub_verify_token: str = None, hub_challenge: str = None):
     if hub_verify_token == VERIFY_TOKEN:
         return hub_challenge
     raise HTTPException(status_code=403, detail="Invalid token")
+
 
 @router.post("/webhook")
 async def webhook(request: Request):
