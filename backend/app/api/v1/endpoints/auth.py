@@ -1,4 +1,3 @@
-# app/api/v1/endpoints/auth.py
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
@@ -12,8 +11,11 @@ from app.schemas.token import Token
 router = APIRouter(prefix="/auth", tags=["auth"])
 
 
-@router.post("/register", response_model=UserOut, status_code=status.HTTP_201_CREATED)
-def register_user(user_in: UserCreate, db: Session = Depends(get_db)):
+@router.post("/register", response_model=Token, status_code=status.HTTP_201_CREATED)
+def register_user(
+    user_in: UserCreate,
+    db: Session = Depends(get_db)
+):
     existing = get_user_by_email(db, user_in.email)
     if existing:
         raise HTTPException(
@@ -28,22 +30,33 @@ def register_user(user_in: UserCreate, db: Session = Depends(get_db)):
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
-    return db_user
 
+    access_token = create_access_token({
+        "sub": db_user.email,
+        "user_id": db_user.id
+    })
 
-@router.post("/token", response_model=Token)
-def login_for_access_token(
-    db: Session = Depends(get_db),
-    form_data: OAuth2PasswordRequestForm = Depends(),
-):
-    # form_data.username — это email
+    return Token(access_token=access_token, token_type="bearer")
+
+@router.post("/login", response_model=Token, status_code=status.HTTP_201_CREATED)
+def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     user = authenticate_user(db, form_data.username, form_data.password)
+
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Неверный email или пароль",
-            headers={"WWW-Authenticate": "Bearer"},
+            headers={"WWW-Authenticate": "Bearer"}
         )
 
-    access_token = create_access_token(subject=user.email)
-    return Token(access_token=access_token)
+    access_token = create_access_token({
+        "sub": user.email,
+        "user_id": user.id
+    })
+
+    return {
+        "access_token": access_token,
+        "token_type": "bearer"
+    }
+
+

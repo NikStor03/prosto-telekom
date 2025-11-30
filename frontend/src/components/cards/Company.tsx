@@ -1,4 +1,3 @@
-// src/components/cards/CompanyCard.tsx
 'use client';
 
 import BusinessIcon from '@mui/icons-material/Business';
@@ -37,7 +36,6 @@ export function CompanyCard({
       }}
     >
       <CardContent sx={{ p: 3 }}>
-        {/* Company Header */}
         <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
           <Box
             sx={{
@@ -60,9 +58,7 @@ export function CompanyCard({
 
         <Divider sx={{ mb: 2.5 }} />
 
-        {/* Company Details */}
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-          {/* Location */}
           <Box sx={{ display: 'flex', alignItems: 'flex-start' }}>
             <LocationOnIcon
               sx={{
@@ -90,7 +86,6 @@ export function CompanyCard({
             </Box>
           </Box>
 
-          {/* Email */}
           <Box sx={{ display: 'flex', alignItems: 'flex-start' }}>
             <EmailIcon
               sx={{
@@ -118,7 +113,6 @@ export function CompanyCard({
             </Box>
           </Box>
 
-          {/* Phone */}
           <Box sx={{ display: 'flex', alignItems: 'flex-start' }}>
             <PhoneIcon
               sx={{

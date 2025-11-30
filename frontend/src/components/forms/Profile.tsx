@@ -5,7 +5,6 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import CameraAltIcon from '@mui/icons-material/CameraAlt';
 import CloseIcon from '@mui/icons-material/Close';
 import EditIcon from '@mui/icons-material/Edit';
 import EmailIcon from '@mui/icons-material/Email';
@@ -77,12 +76,11 @@ export default function ProfileComponent() {
   const isEditingAll = editingField === 'all';
 
   return (
-    <Box sx={{ minHeight: '100vh', backgroundColor: '#f5f5f5' }}>
-      {/* Header */}
+    <Box sx={{ minHeight: '100vh', backgroundColor: 'background.default' }}>
       <Box
         sx={{
-          backgroundColor: '#5c2d5c',
-          color: 'white',
+          backgroundColor: 'primary.main',
+          color: 'primary.contrastText',
           px: 2,
           py: 1.5,
           display: 'flex',
@@ -90,31 +88,31 @@ export default function ProfileComponent() {
           gap: 2,
         }}
       >
-        <IconButton onClick={handleBackClick} sx={{ color: 'white' }}>
+        <IconButton
+          onClick={handleBackClick}
+          sx={{ color: 'primary.contrastText' }}
+        >
           <ArrowBackIcon />
         </IconButton>
-        <Typography variant="h6" fontWeight={500}>
+        <Typography variant="h6" fontWeight={500} color="primary.contrastText">
           Profile
         </Typography>
       </Box>
 
       <Container maxWidth="sm" sx={{ py: 3 }}>
-        {/* Profile Card */}
         <Card
           sx={{ borderRadius: 2, overflow: 'visible', position: 'relative' }}
         >
-          {/* Cover Image */}
           <Box
             sx={{
               height: 120,
-              background: 'linear-gradient(135deg, #5c2d5c 0%, #8b5a8b 100%)',
+              background:
+                'linear-gradient(135deg, primary.main, primary.light)',
               position: 'relative',
             }}
           />
 
-          {/* Profile Content */}
           <Box sx={{ px: 3, pb: 3 }}>
-            {/* Avatar - Centered */}
             <Box
               sx={{
                 display: 'flex',
@@ -128,15 +126,16 @@ export default function ProfileComponent() {
                   width: 96,
                   height: 96,
                   fontSize: '2rem',
-                  border: '4px solid white',
+                  border: '4px solid',
+                  borderColor: 'background.paper',
                   boxShadow: 2,
+                  backgroundColor: 'primary.main',
                 }}
               >
                 {initials}
               </Avatar>
             </Box>
 
-            {/* Name & Edit - Centered */}
             <Box sx={{ mb: 3, textAlign: 'center' }}>
               {editingField !== 'name' && !isEditingAll ? (
                 <Box
@@ -213,18 +212,17 @@ export default function ProfileComponent() {
             </Box>
 
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-              {/* Email */}
               <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.5 }}>
                 <Box
                   sx={{
                     p: 1,
                     borderRadius: 1,
-                    backgroundColor: '#f5f5f5',
+                    backgroundColor: 'action.hover',
                     display: 'flex',
                     alignItems: 'center',
                   }}
                 >
-                  <EmailIcon sx={{ fontSize: 20, color: 'text.secondary' }} />
+                  <EmailIcon sx={{ fontSize: 20 }} color="action" />
                 </Box>
                 <Box sx={{ flex: 1 }}>
                   <Typography
@@ -280,18 +278,17 @@ export default function ProfileComponent() {
                 ) : null}
               </Box>
 
-              {/* Phone */}
               <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.5 }}>
                 <Box
                   sx={{
                     p: 1,
                     borderRadius: 1,
-                    backgroundColor: '#f5f5f5',
+                    backgroundColor: 'action.hover',
                     display: 'flex',
                     alignItems: 'center',
                   }}
                 >
-                  <PhoneIcon sx={{ fontSize: 20, color: 'text.secondary' }} />
+                  <PhoneIcon sx={{ fontSize: 20 }} color="action" />
                 </Box>
                 <Box sx={{ flex: 1 }}>
                   <Typography
@@ -348,17 +345,12 @@ export default function ProfileComponent() {
               </Box>
             </Box>
 
-            {/* Edit All Button */}
             {!isEditingAll ? (
               <Button
                 variant="contained"
                 fullWidth
                 onClick={() => handleEditClick('all')}
-                sx={{
-                  mt: 3,
-                  backgroundColor: '#5c2d5c',
-                  '&:hover': { backgroundColor: '#4a244a' },
-                }}
+                sx={{ mt: 3 }}
               >
                 Edit Profile
               </Button>
@@ -372,10 +364,6 @@ export default function ProfileComponent() {
                   fullWidth
                   onClick={handleSave}
                   startIcon={<SaveIcon />}
-                  sx={{
-                    backgroundColor: '#5c2d5c',
-                    '&:hover': { backgroundColor: '#4a244a' },
-                  }}
                 >
                   Save Changes
                 </Button>

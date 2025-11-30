@@ -3,6 +3,7 @@ export const Routes = {
   Register: '/registration',
   Dashboard: '/dashboard',
   Profile: '/profile',
+  Home: '/',
 };
 
 export const AuthRoutes = [Routes.Login, Routes.Register];

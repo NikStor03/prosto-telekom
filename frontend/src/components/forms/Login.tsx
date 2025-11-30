@@ -2,6 +2,9 @@
 
 import { useState } from 'react';
 
+import { useRouter } from 'next/navigation';
+
+import { Routes } from '@constants/routes';
 import { setCookie } from '@helpers/cookies';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import EmailIcon from '@mui/icons-material/Email';
@@ -23,6 +26,7 @@ import { loginThunk } from '@libs/redux/slices/auth';
 export function LoginForm() {
   const dispatch = useAppDispatch();
   const { loading, error } = useAppSelector((state) => state.auth);
+  const router = useRouter();
 
   const [formData, setFormData] = useState<LoginRequest>({
     email: '',
@@ -43,6 +47,7 @@ export function LoginForm() {
         value: result.access_token,
         maxAge: 216000,
       });
+      router.push(`${Routes.Home}`);
     } catch {}
   };
 

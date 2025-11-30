@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useRef, useState } from 'react';
+import { useState } from 'react';
 
 import AddIcon from '@mui/icons-material/Add';
 import SearchIcon from '@mui/icons-material/Search';
@@ -16,386 +16,324 @@ import {
   Typography,
 } from '@mui/material';
 
+import CreateAgentModal from '../forms/Model';
+
 interface Agent {
   id: string;
   name: string;
-  lastUsed: string;
+  type: 'support' | 'sales';
+  lastActiveAt?: string;
   avatar?: string;
 }
 
 interface PanelProps {
   onAgentSelect: (agentId: string) => void;
-  onExpandChange: (expanded: boolean) => void;
+  onExpandChange?: (expanded: boolean) => void;
+  onAgentCreate?: (agentData: any) => void;
+  agents: Agent[];
 }
 
-const iconBarWidth = 72;
-const expandedWidth = 320;
+const collapsedWidth = 72;
+const expandedWidth = 280;
 
-export default function Panel({ onAgentSelect, onExpandChange }: PanelProps) {
-  const [agents, setAgents] = useState<Agent[]>([
-    { id: '1', name: 'GPT-4 Assistant', lastUsed: '2 mins ago' },
-    { id: '2', name: 'Code Helper', lastUsed: '1 hour ago' },
-    { id: '3', name: 'Data Analyst', lastUsed: 'Yesterday' },
-    { id: '4', name: 'Designer Bot', lastUsed: '3 days ago' },
-  ]);
-
+export default function Panel({
+  onAgentSelect,
+  onExpandChange,
+  onAgentCreate,
+  agents,
+}: PanelProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [isExpanded, setIsExpanded] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const leaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const [selectedAgent, setSelectedAgent] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const handleCreateAgent = useCallback(() => {
-    const newAgent: Agent = {
-      id: Date.now().toString(),
-      name: `New Agent ${agents.length + 1}`,
-      lastUsed: 'Just now',
-    };
-    setAgents([newAgent, ...agents]);
-  }, [agents]);
-
-  const handleMouseEnter = useCallback(() => {
-    if (leaveTimeoutRef.current) {
-      clearTimeout(leaveTimeoutRef.current);
-      leaveTimeoutRef.current = null;
-    }
+  const handleMouseEnter = () => {
     setIsExpanded(true);
-    onExpandChange(true);
-  }, [onExpandChange]);
+    onExpandChange?.(true);
+  };
 
-  const handleMouseLeave = useCallback(
-    (e: React.MouseEvent<HTMLDivElement>) => {
-      // Проверяем действительно ли курсор покинул панель
-      const rect = containerRef.current?.getBoundingClientRect();
-      if (!rect) return;
+  const handleMouseLeave = () => {
+    setIsExpanded(false);
+    onExpandChange?.(false);
+  };
 
-      const { clientX, clientY } = e;
-      const isOutside =
-        clientX < rect.left ||
-        clientX > rect.right ||
-        clientY < rect.top ||
-        clientY > rect.bottom;
+  const handleAgentClick = (agentId: string) => {
+    setSelectedAgent(agentId);
+    onAgentSelect(agentId);
+  };
 
-      if (isOutside) {
-        if (leaveTimeoutRef.current) {
-          clearTimeout(leaveTimeoutRef.current);
-        }
-        leaveTimeoutRef.current = setTimeout(() => {
-          setIsExpanded(false);
-          onExpandChange(false);
-        }, 50);
-      }
-    },
-    [onExpandChange]
-  );
+  const handleCreateAgent = (agentData: any) => {
+    onAgentCreate?.(agentData);
+    setIsModalOpen(false);
+  };
 
-  const filteredAgents = agents.filter((agent) =>
-    agent.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredAgents = agents.filter((agent) => {
+    const name = agent?.name ?? '';
+    return name.toLowerCase().includes(searchQuery.toLowerCase());
+  });
+
+  const getLastUsedText = (lastActiveAt?: string) => {
+    if (!lastActiveAt) return 'Never used';
+    return lastActiveAt;
+  };
 
   return (
-    <Box
-      ref={containerRef}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-      sx={{
-        width: isExpanded ? expandedWidth : iconBarWidth,
-        background:
-          'linear-gradient(180deg, rgba(26, 15, 30, 0.95) 0%, rgba(15, 7, 18, 0.98) 100%)',
-        borderRight: 1,
-        borderColor: 'divider',
-        display: 'flex',
-        flexDirection: 'row',
-        position: 'fixed',
-        height: '100vh',
-        top: 0,
-        left: 0,
-        zIndex: 1200,
-        transition: 'width 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-        overflow: 'hidden',
-      }}
-    >
-      {/* Icon Bar - Always Visible */}
+    <>
       <Box
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
         sx={{
-          width: iconBarWidth,
+          width: isExpanded ? expandedWidth : collapsedWidth,
+          height: '100vh',
+          bgcolor: 'primary.main',
+          borderRight: 1,
+          borderColor: 'primary.dark',
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          zIndex: 1200,
+          transition: 'width 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+          overflow: 'hidden',
           display: 'flex',
           flexDirection: 'column',
-          alignItems: 'center',
-          py: 2,
-          flexShrink: 0,
         }}
       >
-        {/* New Agent Icon */}
-        <Tooltip
-          title="New Agent"
-          placement="right"
-          disableHoverListener={isExpanded}
-        >
-          <IconButton
-            onClick={handleCreateAgent}
-            sx={{
-              width: 48,
-              height: 48,
-              backgroundColor: 'primary.main',
-              color: 'primary.contrastText',
-              mb: 2,
-              '&:hover': {
-                backgroundColor: 'primary.dark',
-                borderRadius: 2,
-              },
-              transition: 'all 0.2s ease',
-            }}
-          >
-            <AddIcon />
-          </IconButton>
-        </Tooltip>
-
-        <Divider
-          sx={{
-            width: 40,
-            mb: 2,
-          }}
-        />
-
-        {/* Agent Icons */}
         <Box
           sx={{
             flexGrow: 1,
             overflowY: 'auto',
-            width: '100%',
+            overflowX: 'hidden',
+            px: isExpanded ? 2 : 1.5,
+            pt: 2.5,
             '&::-webkit-scrollbar': {
-              width: 4,
+              width: 6,
             },
             '&::-webkit-scrollbar-thumb': {
-              backgroundColor: 'action.hover',
-              borderRadius: 2,
+              backgroundColor: 'rgba(255, 255, 255, 0.2)',
+              borderRadius: 3,
             },
           }}
         >
           {filteredAgents.map((agent) => (
             <Tooltip
               key={agent.id}
-              title={agent.name}
+              title={!isExpanded ? agent.name : ''}
               placement="right"
-              disableHoverListener={isExpanded}
+              arrow
             >
               <Box
+                onClick={() => handleAgentClick(agent.id)}
                 sx={{
                   display: 'flex',
-                  justifyContent: 'center',
-                  mb: 1.5,
+                  alignItems: 'center',
+                  gap: 0.5,
+                  height: 56,
+                  px: isExpanded ? 0.75 : 0,
+                  mb: 0.5,
+                  borderRadius: 2,
+                  cursor: 'pointer',
+                  color: 'white',
+                  backgroundColor:
+                    selectedAgent === agent.id
+                      ? 'rgba(255, 255, 255, 0.15)'
+                      : 'transparent',
+                  transition: 'all 0.2s ease',
+                  justifyContent: isExpanded ? 'flex-start' : 'center',
+                  '&:hover': {
+                    backgroundColor:
+                      selectedAgent === agent.id
+                        ? 'rgba(255, 255, 255, 0.2)'
+                        : 'rgba(255, 255, 255, 0.1)',
+                  },
                 }}
               >
                 <Avatar
-                  onClick={() => onAgentSelect(agent.id)}
                   sx={{
-                    width: 48,
-                    height: 48,
-                    backgroundColor: 'secondary.main',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s ease',
-                    '&:hover': {
-                      borderRadius: 2,
-                      backgroundColor: 'primary.main',
-                    },
+                    width: 40,
+                    height: 40,
+                    bgcolor:
+                      selectedAgent === agent.id
+                        ? 'primary.contrastText'
+                        : 'rgba(255, 255, 255, 0.1)',
+                    flexShrink: 0,
                   }}
                 >
-                  <SmartToyIcon />
+                  <SmartToyIcon
+                    sx={{
+                      fontSize: 20,
+                      color:
+                        selectedAgent === agent.id
+                          ? 'primary.main'
+                          : 'primary.contrastText',
+                    }}
+                  />
                 </Avatar>
+
+                {isExpanded && (
+                  <Box
+                    sx={{
+                      flexGrow: 1,
+                      minWidth: 0,
+                      opacity: isExpanded ? 1 : 0,
+                      transition: 'opacity 0.2s ease 0.1s',
+                    }}
+                  >
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        fontWeight: 600,
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                        fontSize: '0.9375rem',
+                        color: 'primary.contrastText',
+                      }}
+                    >
+                      {agent.name}
+                    </Typography>
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        color: 'rgba(255, 255, 255, 0.6)',
+                        fontSize: '0.75rem',
+                      }}
+                    >
+                      {getLastUsedText(agent.lastActiveAt)}
+                    </Typography>
+                  </Box>
+                )}
               </Box>
             </Tooltip>
           ))}
-        </Box>
 
-        {/* Search Icon at Bottom */}
-        <Tooltip
-          title="Search"
-          placement="right"
-          disableHoverListener={isExpanded}
-        >
-          <IconButton
-            sx={{
-              width: 48,
-              height: 48,
-              color: 'text.secondary',
-              '&:hover': {
-                color: 'primary.main',
-                backgroundColor: 'action.hover',
-                borderRadius: 2,
-              },
-            }}
+          <Tooltip
+            title={!isExpanded ? 'Create Agent' : ''}
+            placement="right"
+            arrow
           >
-            <SearchIcon />
-          </IconButton>
-        </Tooltip>
-      </Box>
-
-      {/* Expanded Text Content */}
-      <Box
-        sx={{
-          width: expandedWidth - iconBarWidth,
-          display: isExpanded ? 'flex' : 'none',
-          flexDirection: 'column',
-          opacity: isExpanded ? 1 : 0,
-          transition: 'opacity 0.2s ease',
-        }}
-      >
-        {/* Header */}
-        <Box sx={{ p: 2, pr: 3 }}>
-          <Typography
-            variant="h6"
-            sx={{
-              color: 'text.primary',
-              fontWeight: 700,
-              mb: 2,
-              fontSize: '0.875rem',
-              textTransform: 'uppercase',
-              letterSpacing: '0.5px',
-            }}
-          >
-            AI Agents
-          </Typography>
-          <Box
-            onClick={handleCreateAgent}
-            sx={{
-              width: '100%',
-              backgroundColor: 'primary.main',
-              color: 'primary.contrastText',
-              borderRadius: 1,
-              py: 1.2,
-              px: 2,
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 1,
-              '&:hover': {
-                backgroundColor: 'primary.dark',
-              },
-              transition: 'all 0.2s ease',
-            }}
-          >
-            <AddIcon sx={{ fontSize: 18 }} />
-            <Typography
-              variant="button"
-              sx={{ fontWeight: 600, fontSize: '0.875rem' }}
-            >
-              New Agent
-            </Typography>
-          </Box>
-        </Box>
-
-        <Divider />
-
-        {/* Agents List */}
-        <Box
-          sx={{
-            flexGrow: 1,
-            overflowY: 'auto',
-            px: 2,
-            py: 1,
-            '&::-webkit-scrollbar': {
-              width: 6,
-            },
-            '&::-webkit-scrollbar-track': {
-              backgroundColor: 'transparent',
-            },
-            '&::-webkit-scrollbar-thumb': {
-              backgroundColor: 'action.hover',
-              borderRadius: 3,
-              '&:hover': {
-                backgroundColor: 'action.selected',
-              },
-            },
-          }}
-        >
-          {filteredAgents.map((agent) => (
             <Box
-              key={agent.id}
-              onClick={() => onAgentSelect(agent.id)}
+              onClick={() => setIsModalOpen(true)}
               sx={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: 1.5,
-                p: 1,
+                gap: 5.5,
+                height: 56,
+                px: isExpanded ? 0.75 : 0,
                 mb: 0.5,
-                borderRadius: 1,
+                borderRadius: 2,
                 cursor: 'pointer',
-                color: 'text.secondary',
-                transition: 'all 0.15s ease',
+                color: 'primary.main',
+                bgcolor: 'primary.contrastText',
+                justifyContent: isExpanded ? 'flex-start' : 'center',
+                transition: 'all 0.2s ease',
                 '&:hover': {
-                  backgroundColor: 'action.hover',
-                  color: 'text.primary',
+                  bgcolor: 'rgba(255, 255, 255, 0.9)',
                 },
               }}
             >
-              <Avatar
+              <Box
                 sx={{
-                  width: 32,
-                  height: 32,
-                  backgroundColor: 'secondary.main',
-                  flexShrink: 0,
+                  width: 40,
+                  height: 40,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
                 }}
               >
-                <SmartToyIcon sx={{ fontSize: 18 }} />
-              </Avatar>
-              <Box sx={{ flexGrow: 1, minWidth: 0 }}>
+                <AddIcon sx={{ fontSize: 24 }} />
+              </Box>
+              {isExpanded && (
                 <Typography
                   variant="body2"
                   sx={{
                     fontWeight: 600,
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
                     fontSize: '0.9375rem',
+                    opacity: isExpanded ? 1 : 0,
+                    transition: 'opacity 0.2s ease 0.1s',
                   }}
                 >
-                  {agent.name}
+                  Create Agent
                 </Typography>
-                <Typography
-                  variant="caption"
-                  sx={{
-                    color: 'text.disabled',
-                    fontSize: '0.75rem',
-                  }}
-                >
-                  {agent.lastUsed}
-                </Typography>
-              </Box>
+              )}
             </Box>
-          ))}
+          </Tooltip>
         </Box>
 
-        {/* Search at Bottom */}
-        <Box
+        <Divider
           sx={{
-            p: 2,
-            pt: 1,
-            borderTop: 1,
-            borderColor: 'divider',
+            borderColor: 'rgba(255, 255, 255, 0.2)',
+            mx: 2,
+            my: 1,
           }}
-        >
-          <TextField
-            fullWidth
-            placeholder="Search agents..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            size="small"
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon sx={{ color: 'text.disabled', fontSize: 18 }} />
-                </InputAdornment>
-              ),
-              sx: {
-                fontSize: '0.875rem',
-                '& input': {
-                  padding: '8px 12px',
+        />
+
+        <Box sx={{ px: isExpanded ? 2 : 1, pb: 2 }}>
+          {isExpanded ? (
+            <TextField
+              fullWidth
+              placeholder="Search agents..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              size="small"
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon
+                      sx={{ color: 'rgba(255, 255, 255, 0.7)', fontSize: 18 }}
+                    />
+                  </InputAdornment>
+                ),
+                sx: {
+                  fontSize: '0.875rem',
+                  backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                  borderRadius: 3,
+                  color: 'primary.contrastText',
+                  '& .MuiOutlinedInput-notchedOutline': {
+                    border: 'none',
+                  },
+                  '&:hover': {
+                    backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                  },
+                  '&.Mui-focused': {
+                    backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                    '& .MuiOutlinedInput-notchedOutline': {
+                      border: '1px solid rgba(255, 255, 255, 0.3)',
+                    },
+                  },
+                  '& input': {
+                    padding: '8px 12px',
+                    '&::placeholder': {
+                      color: 'rgba(255, 255, 255, 0.6)',
+                      opacity: 1,
+                    },
+                  },
                 },
-              },
-            }}
-          />
+              }}
+            />
+          ) : (
+            <Tooltip title="Search" placement="right" arrow>
+              <IconButton
+                sx={{
+                  width: 48,
+                  height: 48,
+                  color: 'primary.contrastText',
+                  '&:hover': {
+                    bgcolor: 'rgba(255, 255, 255, 0.1)',
+                  },
+                }}
+              >
+                <SearchIcon />
+              </IconButton>
+            </Tooltip>
+          )}
         </Box>
       </Box>
-    </Box>
+
+      <CreateAgentModal
+        open={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSubmit={handleCreateAgent}
+      />
+    </>
   );
 }

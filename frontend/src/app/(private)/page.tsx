@@ -1,9 +1,11 @@
-// app/(private)/home/page.tsx
 'use client';
 
 import { useState } from 'react';
 
-import { Box, Button, Grid, Typography } from '@mui/material';
+import { useRouter } from 'next/navigation';
+
+import { Routes } from '@constants/routes';
+import { AppBar, Box, Button, Grid, Toolbar, Typography } from '@mui/material';
 
 import { CompanyCard } from '@components/cards/Company';
 import { CreateFab } from '@components/fabs/Create';
@@ -17,6 +19,7 @@ interface Company extends CompanyFormData {
 export default function HomePage() {
   const [companies, setCompanies] = useState<Company[]>([]);
   const [modalOpen, setModalOpen] = useState(false);
+  const router = useRouter();
 
   const handleOpenModal = () => {
     setModalOpen(true);
@@ -35,102 +38,126 @@ export default function HomePage() {
   };
 
   const handleCompanyClick = (companyId: string) => {
-    console.log('Company clicked:', companyId);
-    // Navigate to company page
+    router.push(`${Routes.Dashboard}/1`);
   };
 
   const handleProfileClick = () => {
-    console.log('Navigate to profile');
-    // Navigate to profile page
+    router.push(`${Routes.Profile}/1`);
   };
 
   return (
-    <Box
-      sx={{
-        minHeight: '100vh',
-        backgroundColor: 'background.default',
-        px: '5%',
-        py: '5%',
-      }}
-    >
-      {companies.length === 0 ? (
-        // Empty state - no companies
-        <Box
+    <Box sx={{ minHeight: '100vh', backgroundColor: 'background.default' }}>
+      <AppBar
+        position="static"
+        elevation={0}
+        sx={{
+          backgroundColor: '#FFFFFF',
+          borderBottom: 1,
+          borderColor: 'divider',
+        }}
+      >
+        <Toolbar
           sx={{
-            minHeight: '80vh',
             display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
             justifyContent: 'center',
-            gap: 3,
+            alignItems: 'center',
           }}
         >
           <Typography
-            variant="h4"
+            variant="h5"
             sx={{
-              color: '#FFFFFF',
-              textAlign: 'center',
-              mb: 2,
+              fontWeight: 1000,
+              color: 'primary.main',
+              letterSpacing: '-0.02em',
             }}
           >
-            Welcome! Create your first company
+            Sparrow
           </Typography>
-          <Button
-            variant="contained"
-            size="large"
-            onClick={handleOpenModal}
+        </Toolbar>
+      </AppBar>
+
+      <Box
+        sx={{
+          minHeight: 'calc(100vh - 64px)',
+          px: '5%',
+          py: '5%',
+        }}
+      >
+        {companies.length === 0 ? (
+          <Box
             sx={{
-              px: 6,
-              py: 2,
+              minHeight: '70vh',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 3,
             }}
           >
-            Create Company
-          </Button>
-        </Box>
-      ) : (
-        // Companies list
-        <>
-          <Typography
-            variant="h4"
-            sx={{
-              color: '#FFFFFF',
-              fontWeight: 700,
-              mb: 4,
-            }}
-          >
-            Your Companies
-          </Typography>
+            <Typography
+              variant="h4"
+              sx={{
+                color: '#FFFFFF',
+                textAlign: 'center',
+                mb: 2,
+              }}
+            >
+              Welcome! Create your first company
+            </Typography>
+            <Button
+              variant="contained"
+              size="large"
+              onClick={handleOpenModal}
+              sx={{
+                px: 6,
+                py: 2,
+              }}
+            >
+              Create Company
+            </Button>
+          </Box>
+        ) : (
+          <>
+            <Typography
+              variant="h4"
+              sx={{
+                color: '#FFFFFF',
+                fontWeight: 700,
+                mb: 4,
+              }}
+            >
+              Your Companies
+            </Typography>
 
-          <Grid container spacing={3}>
-            {companies.map((company) => (
-              <Grid item xs={12} sm={6} md={4} key={company.id}>
-                <CompanyCard
-                  name={company.name}
-                  email={company.email}
-                  phone={company.phone}
-                  location={company.location}
-                  onClick={() => handleCompanyClick(company.id)}
-                />
-              </Grid>
-            ))}
-          </Grid>
+            <Grid container spacing={3}>
+              {companies.map((company) => (
+                <Grid item xs={12} sm={6} md={4} key={company.id}>
+                  <CompanyCard
+                    name={company.name}
+                    email={company.email}
+                    phone={company.phone}
+                    location={company.location}
+                    onClick={() => handleCompanyClick(company.id)}
+                  />
+                </Grid>
+              ))}
+            </Grid>
 
-          {/* Floating Action Buttons */}
-          <CreateFab onClick={handleOpenModal} />
-          <ProfileFab onClick={handleProfileClick} hasOtherFabs={true} />
-        </>
-      )}
+            <CreateFab onClick={handleOpenModal} />
+            <ProfileFab onClick={handleProfileClick} hasOtherFabs={true} />
+          </>
+        )}
 
-      {/* Profile button for empty state */}
-      {companies.length === 0 && (
-        <ProfileFab onClick={handleProfileClick} hasOtherFabs={false} />
-      )}
+        {companies.length === 0 && (
+          <ProfileFab onClick={handleProfileClick} hasOtherFabs={false} />
+        )}
 
-      <CreateCompanyModal
-        open={modalOpen}
-        onClose={handleCloseModal}
-        onSubmit={handleCreateCompany}
-      />
+        <CreateCompanyModal
+          open={modalOpen}
+          onClose={handleCloseModal}
+          onSubmit={handleCreateCompany}
+        />
+      </Box>
     </Box>
   );
 }

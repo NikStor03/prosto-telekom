@@ -1,4 +1,3 @@
-# app/api/deps.py
 from typing import Generator
 
 from fastapi import Depends, HTTPException, status
@@ -12,7 +11,7 @@ from app.db.session import SessionLocal
 from app.models.user import User
 from app.schemas.token import TokenPayload
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/token")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/token")
 
 
 def get_db() -> Generator[Session, None, None]:

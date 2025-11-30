@@ -1,4 +1,3 @@
-// src/components/buttons/ProfileFab.tsx
 'use client';
 
 import PersonIcon from '@mui/icons-material/Person';

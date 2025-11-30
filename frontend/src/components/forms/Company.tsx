@@ -1,4 +1,3 @@
-// src/components/modals/CreateCompanyModal.tsx
 'use client';
 
 import { useState } from 'react';
