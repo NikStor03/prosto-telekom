@@ -21,8 +21,7 @@ def create_business(data: BusinessCreate, db: Session = Depends(get_db)):
     )
     db.add(new_business)
     db.commit()
-    db.refresh(new_business) # get id
-
+    db.refresh(new_business)
     return new_business
 
 
@@ -57,6 +56,6 @@ def read_all_businesses_for_user(data: str, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="No businesses found")
 
     return BusinessReadAllResponse(
-        businesses=businesses,  # SQLAlchemy objects OK!
+        businesses=businesses,
         total=total
     )

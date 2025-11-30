@@ -1,17 +1,19 @@
-# app/models/ai.py
 from __future__ import annotations
 
 from sqlalchemy import String, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-
 from app.db.base import Base
+
+
 class AI(Base):
     __tablename__ = "ai"
 
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
 
-    form_id: Mapped[int] = mapped_column(ForeignKey("form.id"), nullable=False)
+    form_id: Mapped[int] = mapped_column(ForeignKey("forms.id"), nullable=False)
+
+    form: Mapped["Form"] = relationship("Form", lazy="joined")
 
     credential_id: Mapped[int] = mapped_column(ForeignKey("credentials.id"))
     credential: Mapped["Credential"] = relationship(back_populates="ai")

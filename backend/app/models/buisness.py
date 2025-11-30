@@ -1,6 +1,4 @@
-# app/models/users.py
 from __future__ import annotations
-
 from app.db.base import Base
 
 from sqlalchemy import Integer, String, ForeignKey
@@ -17,14 +15,12 @@ class Businesses(Base):
     phone_number: Mapped[str] = mapped_column(String, nullable=False)
     website: Mapped[str] = mapped_column(String, nullable=False)
 
-    # One business has many customers
     customers: Mapped[list["Customer"]] = relationship(
-        "Customer",  # string name, no import needed
+        "Customer",
         back_populates="business",
         cascade="all, delete-orphan"
     )
 
-    # One business has many AI items
     ai_items: Mapped[list["AI"]] = relationship(
         "AI",  # string name
         back_populates="business",
